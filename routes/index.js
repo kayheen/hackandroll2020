@@ -8,7 +8,7 @@ router.get('/', function(req, res, next) {
 
 const axios = require('axios');
 
-router.get('/getInformation', async function(req, res, next) {
+router.get('/getinformation', async function(req, res, next) {
   // Temp
   const urlList = [
     'https://ichef.bbci.co.uk/wwfeatures/live/976_549/images/live/p0/7r/yy/p07ryyyj.jpg',
@@ -22,6 +22,7 @@ router.get('/getInformation', async function(req, res, next) {
     'https://ichef.bbci.co.uk/news/660/cpsprodpb/5FD0/production/_108982542_07e3c4ae-e447-48e7-beb9-9242e374ed87.jpg',
     'https://dictionary.cambridge.org/es/images/thumb/black_noun_002_03536.jpg?version=5.0.65'
   ];
+  //var urlList = await initialiseGameImages();
   const infoList = await getTags(10, urlList); // 10 is the number of pictures uploaded, temporarily put to 10
 
   res.send(infoList);
@@ -71,6 +72,7 @@ function getTags(numOfPics, urlList) {
     if (imageInfo !== -1) {
       tagList.push(imageInfo);
     }
+    // else need to change to another picture url
   }
   
   return Promise.all(tagList).then(values => {
@@ -94,7 +96,7 @@ async function createImageInfo(url) {
     info[i].confidence = calculatePoints(confidence);
   }
   imageDict.info = info;
-  console.log(info);
+  //console.log(info);
   return imageDict;
 };
 
@@ -117,10 +119,37 @@ function tag(url) {
       return response.data.tags;
     })
     .catch(function (error) {
-      console.log(error);
-      return 0;
+      //console.log(error);
+      return -1;
     });
 };
+
+router.get('/addimage/', function (req, res, next) {
+  console.log(addImage()); // url
+});
+
+function addImage() {
+  return axios({
+    method: 'get',
+    url: 'https://api.unsplash.com/photos/random/?client_id=c1e57fbf194467701bd8f5c796fb308dacb7c45da1a7aa4d3cebea399e88f715',
+    responseType: 'json'
+})
+  .then(function (response) {
+    //console.log(response.data.urls.regular);
+    return response.data.urls.regular;
+  }).catch(() => console.log("ADD IMAGE ERROR"));
+};
+
+/** Returns the images url for a game of 10 images */
+async function initialiseGameImages() {
+  var i;
+  var urlList = [];
+  for (i = 0; i < 10; i++) {
+    urlList.push(await addImage());
+  }
+  console.log(urlList);
+  return urlList;
+}
 
 module.exports = router;
 
