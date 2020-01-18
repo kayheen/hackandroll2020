@@ -30,7 +30,7 @@ router.get('/getinformation', async function(req, res, next) {
 
 /** Points distribution based on confidence level */
 function calculatePoints(confidence) {
-  switch(roundUp(confidence, 1)) {
+  switch(roundUp(Math.pow(confidence, 4), 1)) {
     case 1.0:
       return 20;
     case 0.9:
