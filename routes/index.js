@@ -87,18 +87,19 @@ async function createImageInfo(url) {
   const info = await tag(url);
   // Number on the list set to 8
   // If less than 8 guesses, return -1 to indicate change of picture
-  if (info.length < 8) {
-//    return createImageInfo(addImage());
-    return -1;
+  if (info === -1 || info.length < 8) {
+    console.log("length", info.length);
+    return await createImageInfo(await addImage());
   }
-  var i;
-  for (i = 0; i < 8; i++) {
-    const confidence = info[i].confidence;
-    info[i].confidence = calculatePoints(confidence);
+  else {
+    var i;
+    for (i = 0; i < 8; i++) {
+      const confidence = info[i].confidence;
+      info[i].confidence = calculatePoints(confidence);
+    }
+    imageDict.info = info;
+    return imageDict;
   }
-  imageDict.info = info;
-  //console.log(info);
-  return imageDict;
 };
 
 /** This function returns the tag corresponding to the image given in the image url 
@@ -117,6 +118,7 @@ function tag(url) {
     }
   })  
     .then(function (response) {
+      console.log(response.data.tags);
       return response.data.tags;
     })
     .catch(function (error) {
@@ -156,7 +158,7 @@ async function initialiseGameImages() {
   for (i = 0; i < 10; i++) {
     urlList.push(await addImage());
   }
-  console.log(urlList);
+  //console.log(urlList);
   return urlList;
 }
 
