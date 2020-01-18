@@ -10,7 +10,7 @@ const axios = require('axios');
 
 router.get('/getinformation', async function(req, res, next) {
   // Temp
-  const urlList = [
+  /*const urlList = [
     'https://ichef.bbci.co.uk/wwfeatures/live/976_549/images/live/p0/7r/yy/p07ryyyj.jpg',
     'https://www.sciencemag.org/sites/default/files/styles/inline__699w__no_aspect/public/dogs_1280p_0.jpg?itok=_Ch9dkfK',
     'https://media-exp1.licdn.com/dms/image/C5103AQH1_LNOfsbFoQ/profile-displayphoto-shrink_200_200/0?e=1584576000&v=beta&t=X9uSLtg5_kxL3nF7vBo_MvZ_JPaXjSb9nwWTzkjHB2M',
@@ -21,8 +21,8 @@ router.get('/getinformation', async function(req, res, next) {
     'https://cs2103-ay1819s2-w14-2.github.io/main/images/carrein.png',
     'https://ichef.bbci.co.uk/news/660/cpsprodpb/5FD0/production/_108982542_07e3c4ae-e447-48e7-beb9-9242e374ed87.jpg',
     'https://dictionary.cambridge.org/es/images/thumb/black_noun_002_03536.jpg?version=5.0.65'
-  ];
-  //var urlList = await initialiseGameImages();
+  ];*/
+  var urlList = await initialiseGameImages();
   const infoList = await getTags(10, urlList); // 10 is the number of pictures uploaded, temporarily put to 10
 
   res.send(infoList);
@@ -125,20 +125,28 @@ function tag(url) {
     });
 };
 
-router.get('/addimage/', function (req, res, next) {
-  console.log(addImage()); // url
+router.get('/addimage/', async function (req, res, next) {
+  console.log(await addImage()); // url
 });
 
 function addImage() {
-  return axios({
-    method: 'get',
-    url: 'https://api.unsplash.com/photos/random/?client_id=c1e57fbf194467701bd8f5c796fb308dacb7c45da1a7aa4d3cebea399e88f715',
-    responseType: 'json'
-})
-  .then(function (response) {
-    //console.log(response.data.urls.regular);
-    return response.data.urls.regular;
-  }).catch(() => console.log("ADD IMAGE ERROR"));
+//  return axios({
+//    method: 'get',
+//    url: 'https://api.unsplash.com/photos/random/?client_id=c1e57fbf194467701bd8f5c796fb308dacb7c45da1a7aa4d3cebea399e88f715',
+//    responseType: 'json'
+//})
+//  .then(function (response) {
+//    //console.log(response.data.urls.regular);
+//    return response.data.urls.regular;
+//  }).catch(() => console.log("ADD IMAGE ERROR"));
+
+    return axios({
+        method: 'get',
+        url: 'http://www.splashbase.co/api/v1/images/random',
+        reponseType: 'json'
+    }).then(function (response) {
+        return response.data.url;
+    }).catch(() => console.log("ADD IMAGE ERROR"));
 };
 
 /** Returns the images url for a game of 10 images */
