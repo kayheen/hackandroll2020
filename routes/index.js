@@ -88,6 +88,7 @@ async function createImageInfo(url) {
   // Number on the list set to 8
   // If less than 8 guesses, return -1 to indicate change of picture
   if (info.length < 8) {
+//    return createImageInfo(addImage());
     return -1;
   }
   var i;
