@@ -8,26 +8,23 @@ router.get('/', function(req, res, next) {
 
 const axios = require('axios');
 
-router.get('/get', async function(req, res, next) {
+router.get('/getInformation', async function(req, res, next) {
   // Temp
   const urlList = [
     'https://ichef.bbci.co.uk/wwfeatures/live/976_549/images/live/p0/7r/yy/p07ryyyj.jpg',
     'https://www.sciencemag.org/sites/default/files/styles/inline__699w__no_aspect/public/dogs_1280p_0.jpg?itok=_Ch9dkfK',
     'https://media-exp1.licdn.com/dms/image/C5103AQH1_LNOfsbFoQ/profile-displayphoto-shrink_200_200/0?e=1584576000&v=beta&t=X9uSLtg5_kxL3nF7vBo_MvZ_JPaXjSb9nwWTzkjHB2M',
     'https://media-exp1.licdn.com/dms/image/C5103AQFOXQZs5nuoXQ/profile-displayphoto-shrink_200_200/0?e=1584576000&v=beta&t=v6Bxl3WaHQTF1LWwHGIYOfL-OFhh2pdpnPIhA2f1p3Y',
-    'https://avatars3.githubusercontent.com/u/37643262?v=4?height=180&width=180'
+    'https://avatars3.githubusercontent.com/u/37643262?v=4?height=180&width=180',
+    'https://live.staticflickr.com/1924/43762031060_4fcdd57460_b.jpg',
+    'https://avatars0.githubusercontent.com/u/42461097?v=4?height=180&width=180',
+    'https://cs2103-ay1819s2-w14-2.github.io/main/images/carrein.png',
+    'https://ichef.bbci.co.uk/news/660/cpsprodpb/5FD0/production/_108982542_07e3c4ae-e447-48e7-beb9-9242e374ed87.jpg',
+    'https://dictionary.cambridge.org/es/images/thumb/black_noun_002_03536.jpg?version=5.0.65'
   ];
-  const infoList = await getTags(5, urlList); // 10 is the number of pictures uploaded, temporarily put to 10
+  const infoList = await getTags(10, urlList); // 10 is the number of pictures uploaded, temporarily put to 10
 
-  console.log('res', infoList);
-  // // calculatePoints(unprocessedTags[i].confidence);
-  // var dict = {};
-  // var i;
-  // for (i = 0; i < unprocessedTags.length(); i++) {
-  //   dict.name = unprocessedTags[i].name;
-  //   dict.points = calculatePoints(unprocessedTags[i].confidence);
-  //   //dict.imageUrl = ;
-  // }
+  res.send(infoList);
 });
 
 /** Points distribution based on confidence level */
@@ -70,16 +67,13 @@ function getTags(numOfPics, urlList) {
 
   var i;
   for (i = 0; i < numOfPics; i++) {
-    tagList.push(createImageInfo(urlList[i]));
+    var imageInfo = createImageInfo(urlList[i]);
+    if (imageInfo !== -1) {
+      tagList.push(imageInfo);
+    }
   }
   
   return Promise.all(tagList).then(values => {
-    // Code below is for the purpose of debugging
-    // for (i = 0; i < numOfPics; i++) {
-    //   console.log(i);
-    //   console.log(values[i]);
-    // }
-    // End of debugging code
     return values;
   });
 };
@@ -89,8 +83,12 @@ async function createImageInfo(url) {
   var imageDict = {};
   imageDict.url = url;
   const info = await tag(url);
-  var i;
   // Number on the list set to 8
+  // If less than 8 guesses, return -1 to indicate change of picture
+  if (info.length < 8) {
+    return -1;
+  }
+  var i;
   for (i = 0; i < 8; i++) {
     const confidence = info[i].confidence;
     info[i].confidence = calculatePoints(confidence);
