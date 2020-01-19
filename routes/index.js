@@ -106,16 +106,18 @@ async function createImageInfo(url) {
   imageDict.url = url;
   const info = await tag(url);
   // Number on the list set to 8
-  // If less than 8 guesses, return -1 to indicate change of picture
-  if (info === -1 || info.length < 6) {
+  // If less than 8 guesses, change the picture
+  if (info === -1 || info.length <= 8) {
     console.log("length", info.length);
     return await createImageInfo(await addImage());
   }
   else {
     var i;
-    for (i = 0; i < 6; i++) {
+    info.splice(8); // remove anything more than 8
+    for (i = 0; i < info.length; i++) {
       const confidence = info[i].confidence;
       info[i].confidence = calculatePoints(confidence);
+      info[i].show = false;
     }
     imageDict.info = info;
     return imageDict;
