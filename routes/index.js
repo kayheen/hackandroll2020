@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
+let uploadedImagesList;
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -26,13 +28,18 @@ router.get('/getinformation', async function(req, res, next) {
   var urlList = await initialiseGameImages();
   const infoList = await getInfoList(urlList);
   res.send(infoList);
-
 });
 
-/** Use images provided by player */
+/** Receive images provided by player */
 router.post('/sendimages', async function(req, res, next) {
-  console.log(req.body());
-  const infoList = await getInfoList(req.body()); 
+  console.log(req.body.url);
+  uploadedImagesList = req.body.url;
+  res.sendStatus(200);
+})
+
+/** Use images provided by player */
+router.get('/getinformationfirebase', async function(req, res, next) {
+  const infoList = await getInfoList(uploadedImagesList);
   res.send(infoList);
 })
 
