@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
+let uploadedImagesList;
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -8,6 +10,7 @@ router.get('/', function(req, res, next) {
 
 const axios = require('axios');
 
+/** Use images from the internet */
 router.get('/getinformation', async function(req, res, next) {
   // Temp
   /*const urlList = [
@@ -23,10 +26,27 @@ router.get('/getinformation', async function(req, res, next) {
     'https://dictionary.cambridge.org/es/images/thumb/black_noun_002_03536.jpg?version=5.0.65'
   ];*/
   var urlList = await initialiseGameImages();
-  const infoList = await getTags(10, urlList); // 10 is the number of pictures uploaded, temporarily put to 10
-
+  const infoList = await getInfoList(urlList);
   res.send(infoList);
 });
+
+/** Receive images provided by player */
+router.post('/sendimages', async function(req, res, next) {
+  console.log(req.body.url);
+  uploadedImagesList = req.body.url;
+  res.sendStatus(200);
+})
+
+/** Use images provided by player */
+router.get('/getinformationfirebase', async function(req, res, next) {
+  const infoList = await getInfoList(uploadedImagesList);
+  res.send(infoList);
+})
+
+/** Returns the information list of all 10 pictures */
+async function getInfoList(urlList) {
+  return await getTags(10, urlList); // 10 is the number of pictures uploaded, temporarily put to 10
+};
 
 /** Points distribution based on confidence level */
 function calculatePoints(confidence) {
@@ -86,8 +106,8 @@ async function createImageInfo(url) {
   imageDict.url = url;
   const info = await tag(url);
   // Number on the list set to 8
-  // If less than 8 guesses, return -1 to indicate change of picture
-  if (info === -1 || info.length < 5) {
+  // If less than 8 guesses, change the picture
+  if (info === -1 || info.length <= 8) {
     console.log("length", info.length);
     return await createImageInfo(await addImage());
   }
